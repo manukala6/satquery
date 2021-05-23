@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM osgeo/gdal:ubuntu-small-latest
 
 # Install Python
 RUN apt update && apt upgrade -y

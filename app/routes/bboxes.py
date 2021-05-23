@@ -9,13 +9,15 @@ from fastapi import APIRouter, Body, Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
+from dotenv import load_dotenv
 import motor.motor_asyncio
 
 from ..models.bbox import BboxModel
 
 router = APIRouter()
 
-client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
+load_dotenv()
+client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGODB_DEV_URL"))
 db = client['query-ts-1']
 
 @router.post(
@@ -23,7 +25,7 @@ db = client['query-ts-1']
     response_description='Add new BBOX',
     response_model=BboxModel
 )
-async def create_student(bbox: BboxModel = Body(...)):
+async def create_bbox(bbox: BboxModel = Body(...)):
     bbox = jsonable_encoder(bbox)
     new_bbox = await db['bboxes'].insert_one(bbox)
     created_bbox = await db['bboxes'].find_one({"_id": new_bbox.inserted_id})

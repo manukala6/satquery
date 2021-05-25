@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple, Union
+from typing import Tuple
 from datetime import datetime
 
 from bson import ObjectId
@@ -22,7 +22,7 @@ class BboxModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user: str = Field(...)
     created_on: datetime = Field(default_factory=datetime.utcnow)
-    coordinates: List[float]
+    coordinates: Tuple[float, float, float, float]
     area_m: float = Field(...)
     #start_time: datetime = Field(...)
     #end_time: datetime = Field(...)

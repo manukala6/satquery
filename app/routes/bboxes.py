@@ -1,17 +1,15 @@
 import os
-import sys
-sys.path.append('../')
 
-from uuid import UUID
 from typing import List
 
-from fastapi import APIRouter, Body, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, HTTPException, BackgroundTasks, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from dotenv import load_dotenv
 import motor.motor_asyncio
 
-from ..models.bbox import BboxModel
+from ..models import BboxModel
+from ..tasks.image_stack import create_image_stack
 
 router = APIRouter()
 
@@ -24,10 +22,11 @@ db = client['query-ts-1']
     response_description='Add new BBOX',
     response_model=BboxModel
 )
-async def create_bbox(bbox: BboxModel = Body(...), background_tasks: BackgroundTasks):
-    bbox = jsonable_encoder(bbox)
-    new_bbox = await db['bboxes'].insert_one(bbox)
+async def put_bbox(bbox: BboxModel, background_tasks: BackgroundTasks):
+    bbox_json = jsonable_encoder(bbox)
+    new_bbox = await db['bboxes'].insert_one(bbox_json)
     created_bbox = await db['bboxes'].find_one({"_id": new_bbox.inserted_id})
+    background_tasks.add_task(create_image_stack, bbox.coordinates, )
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_bbox)
 
 @router.get(

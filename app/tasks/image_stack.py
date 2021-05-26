@@ -5,15 +5,14 @@ from datetime import datetime
 import boto3
 from satsearch import Search
 
-from ..models.bbox import BboxModel
+from ..models import NumType
 from .utils import parse_sentinel2, read_window
 
 def create_image_stack(
-    coordinates: Tuple[float, float, float, float], 
-    area_m: float, 
-    start_time: datetime, 
-    end_time: datetime, 
-    cloud_cover: float
+    coordinates: Tuple[NumType, NumType, NumType, NumType], 
+    start_time: str = '2018-02-12T00:00:00Z', 
+    end_time: str = '2018-04-18T12:31:12Z', 
+    cloud_cover: float = 10
 ):
     timerange = f'{start_time}/{end_time}'
     search = Search(

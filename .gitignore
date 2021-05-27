@@ -116,3 +116,5 @@ dmypy.json
 # VS Code
 .idea/
 .xml
+.vscode/
+.whl

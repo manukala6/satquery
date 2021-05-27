@@ -1,8 +1,12 @@
-from typing import Optional, List, Tuple, Union
+from typing import Tuple, Union
 from datetime import datetime
 
 from bson import ObjectId
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, validator
+
+# types
+NumType = Union[float, int]
+Bounds = Tuple[NumType, NumType, NumType, NumType]
 
 # database validators
 class PyObjectId(ObjectId):
@@ -18,12 +22,13 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
+# Geonos bounding box
 class BboxModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user: str = Field(...)
     created_on: datetime = Field(default_factory=datetime.utcnow)
-    coordinates: List[float]
-    area_m: float = Field(...)
+    coordinates: Tuple[NumType, NumType, NumType, NumType]
+    area_m: NumType = Field(...)
     #start_time: datetime = Field(...)
     #end_time: datetime = Field(...)
     #cloud_cover: float = Field(...)
@@ -34,11 +39,11 @@ class BboxModel(BaseModel):
             raise ValueError('Area of bounding box must be below 50 square meters')
         return v
 
-    @validator('coordinates')
-    def four_coordinates(cls, v):
-        if len(v) != 4:
-            raise ValueError('Bounding box must have only four coordinates')
-        return v
+ #   @validator('coordinates')
+ #   def four_coordinates(cls, v):
+ #       if len(v) != 5:
+ #           raise ValueError('Bounding box must have only four coordinates')
+ #       return v
 
     class Config:
         allow_population_by_field_name = True

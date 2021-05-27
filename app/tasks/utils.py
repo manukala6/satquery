@@ -2,6 +2,7 @@ import rasterio as rio
 from rasterio.session import AWSSession
 from rio_tiler.io import COGReader
 
+# function to parse sentinel 2 IDs from satsearch items
 def parse_sentinel2(sceneid):
     return {
         'utm': sceneid[4:6],
@@ -13,6 +14,7 @@ def parse_sentinel2(sceneid):
         'sceneid': sceneid
     }
 
+# function to read a window as numpy array from a sentinel 2 scene
 def read_window(scene_dict, bounds, band, boto3_session):
     s3_uri = 's3://sentinel-cogs/sentinel-s2-l2a-cogs/{utm}/{lat}/{sq}/{year}/{month}/{sceneid}/'
     s3_uri = s3_uri.format(**scene_dict)

@@ -17,6 +17,7 @@ boto3 = "^1.17.79"
 sat-search = "^0.3.0"
 rasterio = "*"
 rio-tiler = "*"
+mangum = "^0.11.0"
 
 [tool.poetry.dev-dependencies]
 fastapi = "^0.65.1"

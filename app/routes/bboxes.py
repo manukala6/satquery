@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from dotenv import load_dotenv
 import motor.motor_asyncio
 
-from ..models import BboxModel
+from ..models.bbox import BboxModel
 from ..tasks.image_stack import create_image_stack
 
 router = APIRouter()

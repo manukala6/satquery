@@ -7,7 +7,7 @@ import asyncio
 from satsearch import Search
 from rio_tiler.utils import render, linear_rescale
 
-from ..models import NumType
+from ..models.types import NumType
 from .utils import parse_sentinel2, read_window
 
 # set up boto3 session

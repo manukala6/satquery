@@ -38,7 +38,7 @@ async def put_bbox(bbox: BboxModel, background_tasks: BackgroundTasks):
     response_description = 'Get BBOX by id',
     response_model = BboxModel
 )
-async def get_bbox_by_id(bbox_id):
+async def get_bbox_by_id(bbox_id: str):
     if (bbox := await db.bboxes.find_one({'_id': bbox_id})) is not None:
         return bbox
 

@@ -1,5 +1,5 @@
 from typing import Tuple, Union
-from datetime import datetime
+import datetime
 
 from bson import ObjectId
 from pydantic import BaseModel, Field, validator
@@ -27,12 +27,12 @@ class BboxModel(BaseModel):
     alias: str = Field(..., description="user-defined alias")
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user: str = Field(...)
-    created_on: datetime = Field(default_factory=datetime.utcnow)
-    coordinates: Tuple[NumType, NumType, NumType, NumType]
+    created_on: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    coordinates: Tuple[NumType, NumType, NumType, NumType] = Field(..., description="Bounding box of query area in xmin, ymin, xmax, ymax format")
     area_m: NumType = Field(...)
-    #start_time: datetime = Field(...)
-    #end_time: datetime = Field(...)
-    #cloud_cover: float = Field(...)
+    start_date: str = Field(..., description="Filter by scenes after this date. In YYYY-MM-DD format.")
+    end_date: str = Field(...,  description="Filter by scenes before this date. In YYYY-MM-DD format")
+    cloud_cover: int = Field(default=25, description="Maximum cloud cover percentage, between 1-100")
 
     @validator('area_m')
     def area_m_below_50sqkm(cls, v):

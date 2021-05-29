@@ -24,6 +24,7 @@ class PyObjectId(ObjectId):
 
 # Geonos bounding box
 class BboxModel(BaseModel):
+    alias: str = Field(..., description="user-defined alias")
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user: str = Field(...)
     created_on: datetime = Field(default_factory=datetime.utcnow)

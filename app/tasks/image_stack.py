@@ -3,6 +3,7 @@ from typing import Tuple
 from datetime import datetime
 
 import boto3
+import asyncio
 from satsearch import Search
 from rio_tiler.utils import render, linear_rescale
 
@@ -18,13 +19,13 @@ def set_up_boto3_session():
     )
     return boto3_session
 
-def create_image_stack(
-    coordinates: Tuple[NumType, NumType, NumType, NumType], 
-    start_time: str = '2018-02-12T00:00:00Z', 
-    end_time: str = '2018-04-18T12:31:12Z', 
-    cloud_cover: float = 10
+async def create_image_stack(
+    coordinates: Tuple[NumType, NumType, NumType, NumType],
+    start_date: str, 
+    end_date: str, 
+    cloud_cover: int
 ):
-    timerange = f'{start_time}/{end_time}'
+    timerange = f'{start_date}/{end_date}'
     search = Search(
         bbox=coordinates,
         datetime=timerange,
@@ -35,22 +36,27 @@ def create_image_stack(
 
     # list items from satsearch query
     items = [str(item) for item in search.items()]
+    print(f'Found {len(items)} Sentinel-2 scenes')
 
     # parse sentinel2 scene IDs
     scenedicts = [parse_sentinel2(str(item)) for item in items]
 
     # read windows for red and nir bands
     boto3_session = set_up_boto3_session()
+    print('Collecting red band')
     reds = [read_window(scenedict, coordinates, 'B04', boto3_session) for scenedict in scenedicts]
+    print('Collecting near infrared band')
     nirs = [read_window(scenedict, coordinates, 'B08', boto3_session) for scenedict in scenedicts]
 
     # calculate ndvi
+    print('Calculating NDVI')
     ndvis = []
     for i in range(len(scenedicts)):
         ndvis.append((nirs[i] - reds[i]) / (nirs[i] + reds[i]))
 
     # rescale and convert to bytes
-    rescaled = linear_rescale(ndvis[2], (-1,1))
-    int_rescaled = rescaled.astype('uint8')
-    bits = render(int_rescaled)
-    return bits
+    print('Rescaling and rendering')
+    rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
+    for i in range(len(rescaled)):
+        yield render(rescaled[i])
+        await asyncio.sleep(0.5)

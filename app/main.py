@@ -5,7 +5,7 @@ from motor import motor_asyncio
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
-from .routes import bboxes
+from .routes import bboxes#, #authentication
 
 load_dotenv()
 
@@ -17,3 +17,4 @@ load_dotenv()
 app = FastAPI()
 
 app.include_router(bboxes.router, prefix='/bboxes')
+#app.include_router(authentication.router, prefix='/auth')

@@ -24,13 +24,13 @@ db = client['query-ts-1']
     response_model=BboxModel
 )
 async def put_bbox(bbox: BboxModel, background_tasks: BackgroundTasks):
-    #bbox_json = jsonable_encoder(bbox)
-    #new_bbox = await db['bboxes'].insert_one(bbox_json)
-    #created_bbox = await db['bboxes'].find_one({"_id": new_bbox.inserted_id})
+    bbox_json = jsonable_encoder(bbox)
+    new_bbox = await db['bboxes'].insert_one(bbox_json)
+    created_bbox = await db['bboxes'].find_one({"_id": new_bbox.inserted_id})
     #background_tasks.add_task(create_image_stack, bbox.coordinates)
-    bits = create_image_stack(bbox.coordinates, bbox.start_date, bbox.end_date, bbox.cloud_cover)
-    return StreamingResponse(bits, media_type="image/png")
-    #return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_bbox)
+    #bits = create_image_stack(bbox.coordinates, bbox.start_date, bbox.end_date, bbox.cloud_cover)
+    #return StreamingResponse(bits, media_type="image/png")
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_bbox)
 
 @router.get(
     '/{bbox_id}',

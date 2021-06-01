@@ -19,6 +19,7 @@ rasterio = "*"
 rio-tiler = "*"
 mangum = "^0.11.0"
 fastapi-users = {extras = ["mongodb"], version = "^6.1.0"}
+aiofiles = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 fastapi = "^0.65.1"

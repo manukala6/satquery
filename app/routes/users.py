@@ -1,5 +1,4 @@
 import os
-from typing import Collection
 from dotenv import load_dotenv
 
 import motor.motor_asyncio

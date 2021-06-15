@@ -18,6 +18,11 @@ app.include_router(
     tags=["Bbox API"]
 )
 app.include_router(
+    satquery_users.get_auth_router(jwt_authentication),
+    prefix="/auth/jwt",
+    tags=["Authentication API"]
+)
+app.include_router(
     satquery_users.get_register_router(),
     prefix="/auth",
     tags=["Authentication API"]

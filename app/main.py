@@ -28,7 +28,7 @@ app.include_router(
     tags=["Authentication API"]
 )
 app.include_router(
-    satquery_users.get_users_router(requires_verification=True),
+    satquery_users.get_users_router(jwt_authentication),
     prefix="/users",
     tags=["User API"],
 )

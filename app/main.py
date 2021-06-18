@@ -1,16 +1,38 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
+from fastapi_users import fastapi_users
 
-from .routes import bboxes#, #authentication
+from .routes import bboxes
+from .auth import jwt_authentication, satquery_users
+
 
 # initialize fastapi application
 app = FastAPI(title="Geonos Satquery API", redoc_url="/")
 app.mount("/static", StaticFiles(directory="app/static"), name="static") # mount logo file
 
 # add routers
-app.include_router(bboxes.router, prefix='/bboxes')
-#app.include_router(authentication.router, prefix='/auth')
+app.include_router(
+    bboxes.router, 
+    prefix='/bboxes',
+    tags=["Bbox API"]
+)
+app.include_router(
+    satquery_users.get_auth_router(jwt_authentication),
+    prefix="/auth/jwt",
+    tags=["Authentication API"]
+)
+app.include_router(
+    satquery_users.get_register_router(),
+    prefix="/auth",
+    tags=["Authentication API"]
+)
+app.include_router(
+    satquery_users.get_users_router(jwt_authentication),
+    prefix="/users",
+    tags=["User API"],
+)
+
 
 def custom_openapi():
     if app.openapi_schema:
@@ -25,6 +47,5 @@ def custom_openapi():
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
-
 
 app.openapi = custom_openapi

@@ -9,7 +9,7 @@ from .types import NumType
 
 # Geonos bounding box
 class BboxModel(BaseModel):
-    alias: str = Field(..., description="user-defined alias")
+    #alias: str = Field(..., description="user-defined alias")
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user: str = Field(...)
     created_on: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)

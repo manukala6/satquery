@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
-from fastapi_users import fastapi_users
 
 from .routes import bboxes
 from .auth import jwt_authentication, satquery_users

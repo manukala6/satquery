@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 
-from .routes import bboxes
+from .routes import items, bboxes
 from .auth import jwt_authentication, satquery_users
 
 
@@ -14,6 +14,11 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static") # mount
 app.include_router(
     bboxes.router, 
     prefix='/bboxes',
+    tags=["Bbox API"]
+)
+app.include_router(
+    items.router, 
+    prefix='/items',
     tags=["Bbox API"]
 )
 app.include_router(
@@ -31,7 +36,6 @@ app.include_router(
     prefix="/users",
     tags=["User API"],
 )
-
 
 def custom_openapi():
     if app.openapi_schema:

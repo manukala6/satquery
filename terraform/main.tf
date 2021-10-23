@@ -11,24 +11,18 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_ecr_repository" "api_ecr" {
-  name = "satquery-api-dev"
+data "aws_ecr_repository" "api_ecr" {
+  name = var.ecr_name
 }
 
-resource "aws_vpc" "geonos_vpc" {
-  cidr_block = "10.0.0.0/16"
-  instance_tenancy = "default"
-
-  tags = {
-    Name = "geonos_vpc"
-  }
+data "aws_vpc" "core_vpc" {
+  id = var.vpc_id
 }
 
-resource "aws_internet_gateway" "geonos_igw" {
-  vpc_id = resource.aws_vpc.geonos_vpc.id
-
-  tags = {
-    Name = "geonos_igw"
+data "aws_internet_gateway" "core_igw" {
+  filter {
+    name = "attachment.vpc-id"
+    values = [var.vpc_id]
   }
 }
 
@@ -38,9 +32,9 @@ module "subnets" {
   namespace = "geonos"
   stage = "dev"
   name = "satquery-api"
-  vpc_id = resource.aws_vpc.geonos_vpc.id
-  igw_id = resource.aws_internet_gateway.geonos_igw.id
-  cidr_block = resource.aws_vpc.geonos_vpc.cidr_block
+  vpc_id = var.vpc_id
+  igw_id = data.aws_internet_gateway.core_igw.id
+  cidr_block = data.aws_vpc.core_vpc.cidr_block
   availability_zones = ["us-east-1a", "us-east-1b"]
 }
 
@@ -48,7 +42,7 @@ module "security_group" {
   source = "terraform-aws-modules/security-group/aws//modules/http-80"
 
   name = "satquery-api-sg"
-  vpc_id = resource.aws_vpc.geonos_vpc.id
+  vpc_id = var.vpc_id
   ingress_cidr_blocks = ["0.0.0.0/0"]
 }
 
@@ -56,18 +50,18 @@ module "alb" {
   source = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "satquery-api-alb"
+  name = var.elb_name
   vpc_id = module.security_group.security_group_vpc_id
   subnets = module.subnets.public_subnet_ids
   security_groups = [module.security_group.security_group_id]
 
   target_groups = [
     {
-      name = "satquery-api-tg"
+      name = var.tg_name
       backend_port = 80
       backend_protocol = "HTTP"
       target_type = "ip"
-      vpc_id = resource.aws_vpc.geonos_vpc.id
+      vpc_id = var.vpc_id
       health_check = {
         path = "/docs"
         port = "80"
@@ -86,8 +80,8 @@ module "alb" {
   ]
 }
 
-resource "aws_ecs_cluster" "cluster" {
-  name = "satquery-api-cluster"
+data "aws_ecs_cluster" "cluster" {
+  cluster_name = "satquery-api-cluster"
 }
 
 module "container_definition" {
@@ -111,14 +105,15 @@ module "ecs-alb-service-task" {
 
   namespace = "geonos"
   stage = "dev"
-  name = "satquery-api"
+  name = var.branch_name
   container_definition_json = module.container_definition.json_map_encoded_list
-  ecs_cluster_arn = aws_ecs_cluster.cluster.arn
+  ecs_cluster_arn = data.aws_ecs_cluster.cluster.arn
   launch_type = "FARGATE"
-  vpc_id = resource.aws_vpc.geonos_vpc.id
+  vpc_id = var.vpc_id
   security_groups = [module.security_group.security_group_id]
   subnet_ids = module.subnets.public_subnet_ids
-  task_exec_policy_arns = ["arn:aws:iam::754370150126:policy/fargate_default_role"]
+  task_exec_policy_arns = var.fargate_task_exec_policy
+  task_exec_role_arn = var.fargate_task_exec_role
   assign_public_ip = true
 
   health_check_grace_period_seconds = 60

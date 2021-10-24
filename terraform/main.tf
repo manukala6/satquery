@@ -36,6 +36,7 @@ module "subnets" {
   igw_id = data.aws_internet_gateway.core_igw.id
   cidr_block = data.aws_vpc.core_vpc.cidr_block
   availability_zones = ["us-east-1a", "us-east-1b"]
+  vpc_default_route_table_id = var.mongodb_route_table_id
 }
 
 module "security_group" {
@@ -89,12 +90,22 @@ module "container_definition" {
   version = "0.58.1"
 
   container_name = "satquery-api-container"
-  container_image = "754370150126.dkr.ecr.us-east-1.amazonaws.com/geonos-dev:latest"
+  container_image = var.container_image
+  
   port_mappings = [
     {
       containerPort = 80
       hostPort = 80
       protocol = "tcp"
+    }
+  ]
+
+  log_configuration = var.awslogs_configuration
+
+  environment = [
+    {
+      name = "MONGODB_DEV_URL"
+      value = var.mongodb_connection_str
     }
   ]
 }
@@ -113,7 +124,6 @@ module "ecs-alb-service-task" {
   security_groups = [module.security_group.security_group_id]
   subnet_ids = module.subnets.public_subnet_ids
   task_exec_policy_arns = var.fargate_task_exec_policy
-  task_exec_role_arn = var.fargate_task_exec_role
   assign_public_ip = true
 
   health_check_grace_period_seconds = 60

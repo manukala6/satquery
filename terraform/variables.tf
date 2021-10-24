@@ -51,6 +51,21 @@ variable "branch_name" {
     type = string
 }
 
-variable "fargate_task_exec_role" {
+variable "mongodb_route_table_id" {
     type = string
+}
+
+variable "mongodb_connection_str" {
+    type = string
+}
+
+variable "awslogs_configuration" {
+    type = object({
+        logDriver = string
+        options = object({
+            awslogs-group = string
+            awslogs-region = string
+            awslogs-stream-prefix = string
+        })
+    })
 }

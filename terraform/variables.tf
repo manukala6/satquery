@@ -9,7 +9,10 @@ variable "availability_zone_names" {
 }
 
 variable "container_image" {
-  type = string
+}
+
+variable "vpc_id" {
+    type = string
 }
 
 variable "container_ports" {
@@ -26,4 +29,43 @@ variable "container_ports" {
         }
     ]
   
+}
+
+variable "fargate_task_exec_policy" {
+    type = list(string)
+}
+
+variable "ecr_name" {
+    type = string
+}
+
+variable "elb_name" {
+    type = string  
+}
+
+variable "tg_name" {
+    type = string
+}
+
+variable "branch_name" {
+    type = string
+}
+
+variable "mongodb_route_table_id" {
+    type = string
+}
+
+variable "mongodb_connection_str" {
+    type = string
+}
+
+variable "awslogs_configuration" {
+    type = object({
+        logDriver = string
+        options = object({
+            awslogs-group = string
+            awslogs-region = string
+            awslogs-stream-prefix = string
+        })
+    })
 }

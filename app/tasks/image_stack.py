@@ -4,11 +4,14 @@ from datetime import datetime
 
 import boto3
 import asyncio
+from dotenv import load_dotenv
 from satsearch import Search
 from rio_tiler.utils import render, linear_rescale
 
 from ..models.types import NumType
 from .utils import parse_sentinel2, read_window
+
+load_dotenv()
 
 # set up boto3 session
 #TODO try/except error

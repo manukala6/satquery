@@ -37,6 +37,10 @@ app.include_router(
     tags=["User API"],
 )
 
+# Add static files
+
+
+# OPENAPI configuration
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema

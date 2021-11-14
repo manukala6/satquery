@@ -6,6 +6,7 @@ import boto3
 import asyncio
 from dotenv import load_dotenv
 from satsearch import Search
+from PIL import Image
 from rio_tiler.utils import render, linear_rescale
 
 from ..models.types import NumType
@@ -21,6 +22,10 @@ def set_up_boto3_session():
         os.environ.get('AWS_SECRET_ACCESS_KEY')
     )
     return boto3_session
+
+def upload_bytes_to_s3(bytes, bucket, key):
+    s3 = boto3.resource('s3')
+    s3.Bucket(bucket).put_object(Key=key, Body=bytes)
 
 async def create_image_stack(
     coordinates: Tuple[NumType, NumType, NumType, NumType],
@@ -60,7 +65,8 @@ async def create_image_stack(
     # rescale and convert to bytes
     print('Rescaling and rendering')
     rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
-    
     for i in range(len(rescaled)):
-        yield render(rescaled[i])
-        await asyncio.sleep(0.5)
+        upload_bytes_to_s3(render(rescaled[i]), 'satquery-nov-test', f'cali_test_{i}.png')
+    #for i in range(len(rescaled)):
+    #    yield render(rescaled[i])
+    #    await asyncio.sleep(0.5)

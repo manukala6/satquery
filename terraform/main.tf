@@ -106,6 +106,14 @@ module "container_definition" {
     {
       name = "MONGODB_DEV_URL"
       value = var.mongodb_connection_str
+    },
+    {
+      name = "AWS_ACCESS_KEY_ID",
+      value = var.aws_access_key_id
+    },
+    {
+      name = "AWS_SECRET_ACCESS_KEY",
+      value = var.aws_secret_access_key
     }
   ]
 }

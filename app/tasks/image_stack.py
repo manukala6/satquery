@@ -6,6 +6,7 @@ import boto3
 import asyncio
 from dotenv import load_dotenv
 from satsearch import Search
+from PIL import Image
 from rio_tiler.utils import render, linear_rescale
 
 from ..models.types import NumType
@@ -22,11 +23,16 @@ def set_up_boto3_session():
     )
     return boto3_session
 
+def upload_bytes_to_s3(bytes, bucket, key):
+    s3 = boto3.resource('s3')
+    s3.Bucket(bucket).put_object(Key=key, Body=bytes)
+
 async def create_image_stack(
     coordinates: Tuple[NumType, NumType, NumType, NumType],
     start_date: str, 
     end_date: str, 
-    cloud_cover: int
+    cloud_cover: int,
+    item_id: str
 ):
     timerange = f'{start_date}/{end_date}'
     search = Search(
@@ -38,11 +44,11 @@ async def create_image_stack(
     )
 
     # list items from satsearch query
-    items = [str(item) for item in search.items()]
-    print(f'Found {len(items)} Sentinel-2 scenes')
+    scenes = [str(item) for item in search.items()]
+    print(f'Found {len(scenes)} Sentinel-2 scenes')
 
     # parse sentinel2 scene IDs
-    scenedicts = [parse_sentinel2(str(item)) for item in items]
+    scenedicts = [parse_sentinel2(str(scene)) for scene in scenes]
 
     # read windows for red and nir bands
     boto3_session = set_up_boto3_session()
@@ -60,7 +66,8 @@ async def create_image_stack(
     # rescale and convert to bytes
     print('Rescaling and rendering')
     rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
-    
     for i in range(len(rescaled)):
-        yield render(rescaled[i])
-        await asyncio.sleep(0.5)
+        upload_bytes_to_s3(render(rescaled[i]), 'satquery-nov-test', f'{item_id}/{i}_{scenes[i]}.png')
+    #for i in range(len(rescaled)):
+    #    yield render(rescaled[i])
+    #    await asyncio.sleep(0.5)

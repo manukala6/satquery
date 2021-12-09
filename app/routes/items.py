@@ -59,5 +59,6 @@ async def post_item(item_req: ItemRequest, background_tasks: BackgroundTasks):
     # return item object as response
     created_item = await db['items'].find_one({"_id": new_item.inserted_id})
     # generate image stack
-    background_tasks.add_task(create_image_stack, item_req.bbox, item_req.start_date, item_req.end_date, item_req.cloud_cover)
+    background_tasks.add_task(
+        create_image_stack, item_req.bbox, item_req.start_date, item_req.end_date, item_req.cloud_cover, item.id)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_item)

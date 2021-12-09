@@ -9,3 +9,8 @@ services:
         - 8008:80
         volumes:
         - ./app:/app
+    redis:
+        image: redis:latest
+        container_name: redis_dev
+        ports:
+        - 6379:6379

@@ -66,5 +66,6 @@ def create_image_stack(
     # rescale and convert to bytes
     print('Rescaling and rendering')
     rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
+    #f'{item_id}/{i}_{scenes[i]}.png'
     for i in range(len(rescaled)):
-        upload_bytes_to_s3(render(rescaled[i]), 'satquery-nov-test', f'{item_id}/{i}_{scenes[i]}.png')
+        upload_bytes_to_s3(render(rescaled[i]), 'satquery-nov-test', f'{item_id}/{i}_{item_id}.png')

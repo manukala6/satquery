@@ -11,6 +11,8 @@ services:
         - ./app:/app
         environment:
             - MONGODB_DEV_URL=${MONGODB_DEV_URL}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     redis:
         image: redis:latest
         container_name: redis_dev

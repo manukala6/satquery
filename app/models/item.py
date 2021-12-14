@@ -29,7 +29,7 @@ class Item(BaseModel):
     type: str = "Feature"
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     bbox: Bounds = Field(..., description="Bounding box of GeoJSON Feature")
-    geometry: Geometry = Field(..., description="GeoJSON Feature")
+    #geometry: Geometry = Field(..., description="GeoJSON Feature")
     properties: Properties = Field(..., description="Sat-query search parameters")
 
     class Config:

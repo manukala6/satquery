@@ -15,12 +15,13 @@ boto3 = "^1.17.79"
 sat-search = "^0.3.0"
 rasterio = "*"
 rio-tiler = "*"
+pillow = "*"
 mangum = "^0.11.0"
 fastapi-users = {extras = ["mongodb", "oauth"], version = "^6.1.0"}
 aiofiles = "^0.7.0"
-pymongo = "^3.11.4"
-motor = "^2.4.0"
-uvicorn = "^0.16.0"
+pymongo = "*"
+motor = "*"
+uvicorn = {extras = ["standard"], version ="^0.16.0"}
 celery = {extras = ["redis"], version = "^5.2.1"}
 
 [tool.poetry.dev-dependencies]

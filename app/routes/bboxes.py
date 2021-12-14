@@ -16,6 +16,7 @@ router = APIRouter()
 
 load_dotenv()
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGODB_DEV_URL"))
+mongo = client['Satquery-1']
 db = client['satquery-dev-db']
 
 @router.put(

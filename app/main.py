@@ -1,14 +1,29 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import items, bboxes
 from .auth import jwt_authentication, satquery_users
 
 
-# initialize fastapi application
+# initialize fastapi application 
 app = FastAPI(title="Geonos Satquery API", redoc_url="/")
 app.mount("/static", StaticFiles(directory="app/static"), name="static") # mount logo file
+
+# CORS configuration
+origins = [
+    "http://localhost:3000",
+    "http://localhost"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # add routers
 app.include_router(

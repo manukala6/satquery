@@ -39,7 +39,7 @@ Asset = Union[Analytic, Thumbnail]
 
 class Assets(BaseModel):
     assets: List[Asset] = list()
-
+    
 class ItemRequest(BaseModel):
     area_m: NumType = Field(...)
     start_date: str = Field(..., description="Filter by scenes after this date. In YYYY-MM-DD format.")

@@ -19,8 +19,8 @@ rio-tiler = "*"
 mangum = "^0.11.0"
 fastapi-users = {extras = ["mongodb", "oauth"], version = "^6.1.0"}
 aiofiles = "^0.7.0"
-pymongo = "^3.11.4"
-motor = "^2.4.0"
+pymongo = "*"
+motor = "*"
 Pillow = "^8.4.0"
 
 [tool.poetry.dev-dependencies]

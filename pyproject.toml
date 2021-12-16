@@ -7,7 +7,6 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 fastapi = "^0.65.1"
-uvicorn = "^0.13.4"
 pydantic = "^1.8.2"
 dnspython = "^2.1.0"
 python-dotenv = "^0.17.1"
@@ -16,17 +15,17 @@ boto3 = "^1.17.79"
 sat-search = "^0.3.0"
 rasterio = "*"
 rio-tiler = "*"
+pillow = "*"
 mangum = "^0.11.0"
 fastapi-users = {extras = ["mongodb", "oauth"], version = "^6.1.0"}
 aiofiles = "^0.7.0"
 pymongo = "*"
 motor = "*"
-Pillow = "^8.4.0"
+uvicorn = {extras = ["standard"], version ="^0.16.0"}
+celery = {extras = ["redis"], version = "^5.2.1"}
 
 [tool.poetry.dev-dependencies]
 fastapi = "^0.65.1"
-uvicorn = "^0.13.4"
-localstack = "^0.12.19"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

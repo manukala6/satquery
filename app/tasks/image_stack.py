@@ -67,7 +67,7 @@ async def create_image_stack(
     print('Rescaling and rendering')
     rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
     for i in range(len(rescaled)):
-        upload_bytes_to_s3(render(rescaled[i]), 'satquery-dec-test', f'{item_id}/{i}_{scenes[i]}.png')
+        upload_bytes_to_s3(render(rescaled[i]), 'satquery-dec-test', f'{item_id}/{i}_{item_id}.png')
     #for i in range(len(rescaled)):
     #    yield render(rescaled[i])
     #    await asyncio.sleep(0.5)

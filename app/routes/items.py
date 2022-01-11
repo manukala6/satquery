@@ -2,12 +2,15 @@ import os
 
 from dotenv.main import load_dotenv
 from fastapi.encoders import jsonable_encoder
+from fastapi.params import Body
 import motor.motor_asyncio
 
-from fastapi import APIRouter, status, BackgroundTasks
+from fastapi import APIRouter, status, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse
 
-from ..models.item import Geometry, Item, ItemRequest, Properties
+from app.models.bbox import BboxModel
+
+from ..models.item import Geometry, Item, ItemRequest, Properties, UpdateItem
 from ..tasks.image_stack import create_image_stack
 
 
@@ -62,3 +65,26 @@ async def post_item(item_req: ItemRequest, background_tasks: BackgroundTasks):
     background_tasks.add_task(
         create_image_stack, item_req.bbox, item_req.start_date, item_req.end_date, item_req.cloud_cover, item.id)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_item)
+
+@router.put(
+    '/{item_id}',
+    response_description='Update STAC Item',
+    response_model=Item,
+    response_model_include={'alias'}
+)
+async def put_item(item_id: str, update_item_req: UpdateItem = Body(...)):
+    update_item_req = {k: v for k, v in update_item_req.dict().items() if v is not None}
+
+    if len(update_item_req) >= 1:
+        update_result = await db['items'].update_one({'_id': item_id}, {'$set': update_item_req})
+
+        if update_result.modified_count == 1:
+            if (
+                updated_item := await db["items"].find_one({"_id": item_id})
+            ) is not None:
+                return JSONResponse(status_code=status.HTTP_201_CREATED, content=updated_item)
+
+    if (existing_item := await db["items"].find_one({"_id": item_id})):
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=existing_item)
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")

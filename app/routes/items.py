@@ -20,6 +20,18 @@ load_dotenv()
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGODB_DEV_URL"))
 db = client['satquery-dev-db']
 
+@router.get(
+    '/{item_id}',
+    response_description = 'Get STAC Item by id',
+    response_model = Item,
+    response_model_include={"alias"}
+)
+async def get_item_by_id(item_id: str):
+    if (item := await db.items.find_one({'_id': item_id})) is not None:
+        print('Item found')
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=item)
+    raise HTTPException(status_code=404, detail=f"Item {id} not found")
+
 @router.post(
     '/',
     response_description='Add new STAC Item',
@@ -68,7 +80,7 @@ async def post_item(item_req: ItemRequest, background_tasks: BackgroundTasks):
 
 @router.put(
     '/{item_id}',
-    response_description='Update STAC Item',
+    response_description='Update a STAC Item',
     response_model=Item,
     response_model_include={'alias'}
 )

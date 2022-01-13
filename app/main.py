@@ -34,7 +34,7 @@ app.include_router(
 app.include_router(
     items.router, 
     prefix='/items',
-    tags=["Bbox API"]
+    tags=["STAC Item API"]
 )
 app.include_router(
     satquery_users.get_auth_router(jwt_authentication),

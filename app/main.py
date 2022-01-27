@@ -1,14 +1,38 @@
+from celery import Celery
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import items, bboxes
+import os
+from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from .routes import bboxes
+from .routes.items import item_router
 from .auth import jwt_authentication, satquery_users
 
+# connect to db
+load_dotenv()
+#async def connect_to_mongo():
+#    client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGODB_DEV_URL"))
+#    db = client['satquery-dev-db']
 
 # initialize fastapi application 
 app = FastAPI(title="Geonos Satquery API", redoc_url="/")
+
+# startup events
+@app.on_event("startup")
+async def startup_db_client():
+    app.mongodb_client = AsyncIOMotorClient(os.environ.get("MONGODB_DEV_URL"))
+    app.mongodb = app.mongodb_client['satquery-dev-db']
+
+# Shutdown Event
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    app.mongodb_client.close()
+
+app.add_event_handler("startup", startup_db_client) 
 app.mount("/static", StaticFiles(directory="app/static"), name="static") # mount logo file
 
 # CORS configuration
@@ -29,10 +53,11 @@ app.add_middleware(
 app.include_router(
     bboxes.router, 
     prefix='/bboxes',
-    tags=["Bbox API"]
+    tags=["Bbox API"]#,
+    #dependencies=[Depends(get_db_connection)]
 )
 app.include_router(
-    items.router, 
+    item_router(app), 
     prefix='/items',
     tags=["STAC Item API"]
 )
@@ -51,9 +76,6 @@ app.include_router(
     prefix="/users",
     tags=["User API"],
 )
-
-# Add static files
-
 
 # OPENAPI configuration
 def custom_openapi():

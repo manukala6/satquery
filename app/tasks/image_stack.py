@@ -6,6 +6,7 @@ from datetime import datetime
 import boto3
 from dotenv import load_dotenv
 from fastapi.encoders import jsonable_encoder
+import numpy as np
 from satsearch import Search
 from PIL import Image
 from rio_tiler.utils import render, linear_rescale
@@ -76,13 +77,17 @@ async def create_image_stack(
 
     # calculate ndvi 
     print('Calculating NDVI')
-    ndvis = []
+    ndvi_arrs = []
+    ndvi_num = []
     for i in range(len(scenedicts)):
-        ndvis.append((nirs[i] - reds[i]) / (nirs[i] + reds[i]))
+        ndvi_arr = (nirs[i] - reds[i]) / (nirs[i] + reds[i])
+        ndvi_arrs.append(ndvi_arr)
+        ndvi_num.append(np.mean(ndvi_arr))
+
 
     # rescale and convert to bytes
     print('Rescaling and rendering')
-    rescaled = [linear_rescale(ndvi, (-1,1)).astype('uint8') for ndvi in ndvis]
+    rescaled = [linear_rescale(ndvi_arr, (-1,1)).astype('uint8') for ndvi_arr in ndvi_arrs]
     for i in range(len(rescaled)):
         upload_bytes_to_s3(render(rescaled[i]), 'satquery-dec-test', f'{item_id}/{i}_{item_id}.png')
     
@@ -96,14 +101,14 @@ async def create_image_stack(
             'url': f'https://satquery-dec-test.s3.amazonaws.com/{item_id}/{i}_{item_id}.png',
             'date': datetime.utcnow(),
             'driver': 'image/png',
-            'index': 'ndvi',
+            'index': 'NDVI',
+            'value': ndvi_num[i],
             'scene_id': str(item_id)
         }
         new_asset = await db.assets.insert_one(
             jsonable_encoder(asset_dict)
         )
         assets.append(jsonable_encoder(Thumbnail(**asset_dict)))
-    print('new asset uploaded %s' % pprint.pformat(new_asset))
     update_item_req = {k: v for k, v in UpdateItem(assets=assets).dict().items() if v is not None}
     print(update_item_req)
     old_document = await db.items.find_one(filter={'_id': item_id})

@@ -17,5 +17,6 @@ class Thumbnail(Asset):
     url: str = Field(..., description="S3 URL to thumbnail")
     date: datetime.datetime = Field(..., description="Date of thumbnail")
     index: str = Field(..., description="Index of thumbnail")
+    value: float = Field(..., description="Mean of computed index")
     driver: str = Field(default="image/png", description="MIME type of thumbnail")
     scene_id: str = Field(..., description="Satquery Scene ID")

@@ -4,7 +4,10 @@ import datetime
 from bson import ObjectId
 from pydantic import BaseModel, Field, validator
 
+from app.models import bbox
+
 from .enum import AssetType
+from .assets import Asset, Thumbnail
 from .types import Coordinate, NumType, Bounds
 from .db import PyObjectId
 
@@ -20,25 +23,6 @@ class Properties(BaseModel):
     cloud_cover: int = Field(default=25, description="Maximum cloud cover percentage, between 1-100")
     satellite: str = Field(default="Sentinel-2", description="Satellite name")
     index: str = Field(default='NDVI', description="Spectral index")
-
-class Analytic(BaseModel):
-    type: str = Field(default='analytic', description="Type of asset")
-    url: str = Field(..., description="Scene S3 URI")
-    date: datetime.datetime = Field(..., description="Date of scene")
-    driver: str = Field(default="GeoTIFF", description="File type of scene, either GeoTIFF or JPEG2000")
-    scene_id: str = Field(..., description="Scene ID")
-
-
-class Thumbnail(BaseModel):
-    type: str = Field(default='thumbnail', description="Type of asset")
-    url: str = Field(..., description="S3 URL to thumbnail")
-    date: datetime.datetime = Field(..., description="Date of thumbnail")
-    driver: str = Field(default="image/png", description="MIME type of thumbnail")
-
-Asset = Union[Analytic, Thumbnail]
-
-class Assets(BaseModel):
-    assets: List[Asset] = list()
     
 class ItemRequest(BaseModel):
     area_m: NumType = Field(...)
@@ -61,10 +45,21 @@ class Item(BaseModel):
     bbox: Bounds = Field(..., description="Bounding box of GeoJSON Feature")
     geometry: Geometry = Field(..., description="GeoJSON Feature")
     properties: Properties = Field(..., description="Sat-query search parameters")
-    assets: Optional[Assets]
+    assets: Optional[List[Thumbnail]]
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-    
+
+class UpdateItem(BaseModel):
+    stac_version: Optional[str]
+    bbox: Optional[Bounds]
+    geometry: Optional[Geometry]
+    properties: Optional[Properties]
+    assets: Optional[List[Thumbnail]]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

@@ -1,6 +1,8 @@
 import rasterio as rio
 from rasterio.session import AWSSession
 from rio_tiler.io import COGReader
+from rio_tiler.models import ImageData
+
 
 # function to parse sentinel 2 IDs from satsearch items
 def parse_sentinel2(sceneid):
@@ -21,6 +23,6 @@ def read_window(scene_dict, bounds, band, boto3_session):
 
     with rio.Env(AWSSession(boto3_session)):
         with COGReader(f'{s3_uri}{band}.tif')as cog:
-            img: ImageData = cog.part(bounds, max_size=100)
+            img: ImageData = cog.part(bounds)
 
     return img.data[0, 2:]

@@ -21,8 +21,8 @@ fastapi-users = {extras = ["mongodb", "oauth"], version = "^6.1.0"}
 aiofiles = "^0.7.0"
 pymongo = "*"
 motor = "*"
-uvicorn = {extras = ["standard"], version ="^0.16.0"}
-celery = "5.1.2"
+uvicorn = {extras = ["standard"], version ="*"}
+celery = "*"
 redis = "3.5.3"
 
 [tool.poetry.dev-dependencies]

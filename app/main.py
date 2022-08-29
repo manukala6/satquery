@@ -1,4 +1,3 @@
-from celery import Celery
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.staticfiles import StaticFiles

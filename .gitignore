@@ -116,3 +116,14 @@ dmypy.json
 # VS Code
 .idea/
 .xml
+.vscode/
+.whl
+
+# Terraform lock/state files
+terraform/.terraform.tfstate.lock.info
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/.terraform
+terraform/terraform.tfstate.backup
+*.tfvars
+*.tfstate*

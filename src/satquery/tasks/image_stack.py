@@ -12,7 +12,7 @@ from PIL import Image
 from rio_tiler.utils import render, linear_rescale
 from fastapi.params import Body
 
-from app.models.item import UpdateItem
+from satquery.models.item import UpdateItem
 from ..models.types import NumType
 from ..models.assets import Thumbnail, Analytic
 from .utils import parse_sentinel2, read_window

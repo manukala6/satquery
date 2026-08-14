@@ -4,7 +4,7 @@ import datetime
 from bson import ObjectId
 from pydantic import BaseModel, Field, validator
 
-from app.models import bbox
+from satquery.models import bbox
 
 from .enum import AssetType
 from .assets import Asset, Thumbnail

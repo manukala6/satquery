@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+    app:
+        build:
+            context: .
+        container_name: app_dev
+        ports:
+        - 8008:80
+        volumes:
+        - ./app:/app
+        environment:
+            - MONGODB_DEV_URL=${MONGODB_DEV_URL}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
